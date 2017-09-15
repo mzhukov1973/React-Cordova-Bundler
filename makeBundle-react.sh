@@ -1,0 +1,148 @@
+#!/bin/bash
+
+#TODO:
+# Check for sources' existence before copying
+
+#------Options-------------------------------------------------------------------------------------------------------------------------------------
+#+++++N.B.!: Should add simpler abs/rel paths input options here, autodetect.++++++
+BASE_APP_NAME=
+CORDOVA_BASE_REL="../$BASE_APP_NAME-cordova" #Cordova base dir. Relative path from the root of React Apps' base dir (where this script is located).
+REACT_BASE_REL="."     #React base dir. Since this is Reacts' copy of the script it is  ".".
+CORDOVA_BASE=`readlink -f $CORDOVA_BASE_REL`    #Calculated absolute path of Cordova apps' base directory.
+REACT_BASE=`readlink -f $REACT_BASE_REL`        #Calculated absolute path of React apps' base directory.
+CORDOVA_RUN=                                    #Script to build and run Cordova (from the root of Cordova app directory). If not set or empty, then use builtin defaults.
+CORDOVA_KEYSTORE=
+CORDOVA_KEYSTORE_PASSWORD=
+CORDOVA_KEY=
+CORDOVA_KEY_PASSWORD=
+IAM=                                         #Which version of the script this one is. (Todo: add autodetection.)
+#--------------------------------------------------------------------------------------------------------------------------------------------------
+VERSION=
+#--------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+#------Functions-----------------------------------------------------------------------------------------------------------------------------------
+update_copied_asset-manifest () {
+ sed -i 's/css\/main[\.a-zA-Z0-9]*css/css\/react_main\.css/g'           "$CORDOVA_BASE/www/asset-manifest.json";
+ sed -i 's/css\/main[\.a-zA-Z0-9]*css\.map/css\/react_main\.css\.map/g' "$CORDOVA_BASE/www/asset-manifest.json";
+ sed -i 's/js\/main[\.a-zA-Z0-9]*js/js\/react_main\.js/g'               "$CORDOVA_BASE/www/asset-manifest.json";
+ sed -i 's/js\/main[\.a-zA-Z0-9]*js\.map/js\/react_main\.js.\map/g'     "$CORDOVA_BASE/www/asset-manifest.json";
+ sed -i 's/media\/logo[\.a-zA-Z0-9]*svg/media\/react_logo\.svg/g'       "$CORDOVA_BASE/www/asset-manifest.json";
+}
+update_copied_manifest () {
+ sed -i 's/favicon.ico/react_favicon.ico/g' "$CORDOVA_BASE/www/manifest.json";
+}
+update_copied_index-html () {
+#insert in the head, replacing viewport etc:
+sed -i "s/<meta name=\"viewport\" [^>]*>/<meta http-equiv='Content-Security-Policy' content='default-src \'self\' data: gap: https:\/\/ssl.gstatic.com \'unsafe-eval\'; style-src \'self\' \'unsafe-inline\'; media-src \*; img-src \'self\' data: content:;'><meta name='format-detection' content='telephone=no'><meta name='msapplication-tap-highlight' content='no'><meta name='viewport' content='user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width'><link rel='stylesheet' type='text\/css' href='static\/css\/cordova-index.css'>/g" "$CORDOVA_BASE/www/index.html";
+#insert before '</body>':
+sed -i "s/<\/body>/<script type='text\/javascript' src='cordova\.js'><\/script><script type='text\/javascript' src='static\/js\/cordova-index\.js'><\/script><\/body>/g" "$CORDOVA_BASE/www/index.html";
+#change [css/js]index.[css/js] to static/[css/js]cordova-index.[css/js]:
+sed -i "s/css\/index\.css/static\/css\/cordova-index\.css/g" "$CORDOVA_BASE/www/index.html";
+sed -i "s/js\/index\.js/static\/js\/cordova-index\.js/g" "$CORDOVA_BASE/www/index.html";
+sed -i "s/\.\/static/static/g" "$CORDOVA_BASE/www/index.html";
+sed -i "s/\/static/static/g" "$CORDOVA_BASE/www/index.html";
+}
+rct2cor_root_www () {
+ rm -f "$CORDOVA_BASE/www/asset-manifest.json" "$CORDOVA_BASE/www/manifest.json" "$CORDOVA_BASE"/www/react_*;
+ cd "$REACT_BASE/build";
+ for f in *.*;
+ do
+  if [ "$f" == "asset-manifest.json" ]; then cp "$REACT_BASE/build/$f" "$CORDOVA_BASE/www/$f"; continue; fi
+  if [ "$f" == "manifest.json" ];       then cp "$REACT_BASE/build/$f" "$CORDOVA_BASE/www/$f"; continue; fi
+  if [ "$f" == "index.html" ];          then cp "$REACT_BASE/build/$f" "$CORDOVA_BASE/www/$f"; continue; fi
+  cp "$REACT_BASE/build/$f" "$CORDOVA_BASE/www/react_$f";
+ done;
+ cd "$REACT_BASE";
+}
+
+
+
+update_for_copied_media () {
+  #Sample really - copying the default logo.svg from ./src directory of a vanilla create-react-app app:
+  sed -i 's/logo[\.a-zA-Z0-9]*svg/react_logo\.svg/g' "$CORDOVA_BASE/www/static/css/react_main.css" "$CORDOVA_BASE/www/static/css/react_main.css.map" "$CORDOVA_BASE/www/static/js/react_main.js" "$CORDOVA_BASE/www/static/js/react_main.js.map" "$CORDOVA_BASE/www/index.html";
+  sed -i 's/logo_svg/react_logo_svg/g'               "$CORDOVA_BASE/www/static/js/react_main.js.map";
+}
+rct2cor_media () {
+ rm -f "$CORDOVA_BASE"/www/static/media/react_*;
+ cd "$REACT_BASE/build/static/media";
+ for f in *.*;
+ do
+  if [[ "$f" =~ logo[\.a-zA-Z0-9]*svg ]]; then cp "$REACT_BASE/build/static/media/$f" "$CORDOVA_BASE/www/static/media/react_logo.svg"; continue; fi
+  cp "$REACT_BASE/build/static/media/$f" "$CORDOVA_BASE/www/static/media/react_$f";
+ done;
+ cd "$REACT_BASE";
+}
+
+
+
+update_for_copied_css () {
+ sed -i 's/main[\.a-zA-Z0-9]*css/react_main\.css/g' "$CORDOVA_BASE/www/index.html";
+}
+rct2cor_css () {
+ rm -f "$CORDOVA_BASE"/www/static/css/react_*;
+ cp "$REACT_BASE"/build/static/css/main.*.css "$CORDOVA_BASE/www/static/css/react_main.css";
+ cp "$REACT_BASE"/build/static/css/main.*.css.map "$CORDOVA_BASE/www/static/css/react_main.css.map";
+ cd "$REACT_BASE/build/static/css";
+ for f in *.*;
+ do
+  if [[ "$f" =~ main[\.a-zA-Z0-9]*css ]] || [[ "$f" =~ main[\.a-zA-Z0-9]*css\.map ]]; then continue; fi
+  cp "$REACT_BASE/build/static/css/$f" "$CORDOVA_BASE/www/static/css/react_$f";
+ done;
+ cd "$REACT_BASE";
+}
+
+
+
+update_for_copied_js () {
+ sed -i 's/service-worker\.js/react_service-worker\.js/g' "$CORDOVA_BASE/www/static/js/react_main.js";
+ sed -i 's/main[\.a-zA-Z0-9]*js/react_main\.js/g' "$CORDOVA_BASE/www/index.html";
+}
+rct2cor_js () {
+ rm -f "$CORDOVA_BASE"/www/static/js/react_*;
+ cp "$REACT_BASE"/build/static/js/main.*.js "$CORDOVA_BASE/www/static/js/react_main.js";
+ cp "$REACT_BASE"/build/static/js/main.*.js.map "$CORDOVA_BASE/www/static/js/react_main.js.map";
+ cd "$REACT_BASE/build/static/js";
+ for f in *.*;
+ do
+  if [[ "$f" =~ main[\.a-zA-Z0-9]*js ]] || [[ "$f" =~ main[\.a-zA-Z0-9]*js\.map ]]; then continue; fi
+  cp "$REACT_BASE/build/static/js/$f" "$CORDOVA_BASE/www/static.js/react_$f";
+ done;
+ cd "$REACT_BASE";
+}
+
+
+
+#--------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+#------Script itself-------------------------------------------------------------------------------------------------------------------------------
+
+#Build standalone React app (i.e. 'npm run build'):
+npm run build
+
+#Copy stuff, renaming some files to avoid name collisions as well as updating content to reflect changed paths and filenames:
+# copy[+rename]:
+rct2cor_css;
+rct2cor_js;
+rct2cor_media;
+rct2cor_root_www;
+# update content:
+update_for_copied_css;
+update_for_copied_js;
+update_for_copied_media;
+update_copied_asset-manifest;
+update_copied_manifest;
+update_copied_index-html;
+
+#Build Cordova app (optional - either call user-supplied build script here or use one of the pre-made ones):
+cd "$CORDOVA_BASE"
+if [ -z "$CORDOVA_RUN" ];
+then
+ cordova build android --debug --device -- --keystore="$CORDOVA_KEYSTORE" --storePassword="$CORDOVA_KEYSTORE_PASSWORD" --alias="$CORDOVA_KEY" --password="$CORDOVA_KEY_PASSWORD"
+else
+ "./$CORDOVA_RUN"
+fi
+cd "$REACT_BASE"
+
+#--------------------------------------------------------------------------------------------------------------------------------------------------
