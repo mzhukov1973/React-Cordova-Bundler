@@ -1,21 +1,32 @@
 #!/bin/bash
-
-#TODO:
-# Check for sources' existence before copying
+#===========================================================================#
+#  Copyright 2017 Maxim Zhukov                                              #
+#                                                                           #
+#  Licensed under the Apache License, Version 2.0 (the "License");          #
+#  you may not use this file except in compliance with the License.         #
+#  You may obtain a copy of the License at                                  #
+#                                                                           #
+#      http://www.apache.org/licenses/LICENSE-2.0                           #
+#                                                                           #
+#  Unless required by applicable law or agreed to in writing, software      #
+#  distributed under the License is distributed on an "AS IS" BASIS,        #
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. #
+#  See the License for the specific language governing permissions and      #
+#  limitations under the License.                                           #
+#===========================================================================#
 
 #------Options-------------------------------------------------------------------------------------------------------------------------------------
-#+++++N.B.!: Should add simpler abs/rel paths input options here, autodetect.++++++
-BASE_APP_NAME=
+BASE_APP_NAME=                               #As is - base name of the app, cordova & react apps' folders names are formed based on this variable.
 CORDOVA_BASE_REL="../$BASE_APP_NAME-cordova" #Cordova base dir. Relative path from the root of React Apps' base dir (where this script is located).
-REACT_BASE_REL="."     #React base dir. Since this is Reacts' copy of the script it is  ".".
-CORDOVA_BASE=`readlink -f $CORDOVA_BASE_REL`    #Calculated absolute path of Cordova apps' base directory.
-REACT_BASE=`readlink -f $REACT_BASE_REL`        #Calculated absolute path of React apps' base directory.
-CORDOVA_RUN=                                    #Script to build and run Cordova (from the root of Cordova app directory). If not set or empty, then use builtin defaults.
-CORDOVA_KEYSTORE=
-CORDOVA_KEYSTORE_PASSWORD=
-CORDOVA_KEY=
-CORDOVA_KEY_PASSWORD=
-IAM=                                         #Which version of the script this one is. (Todo: add autodetection.)
+REACT_BASE_REL="."                           #React base dir. Since this is Reacts' copy of the script it is  ".".
+CORDOVA_BASE=`readlink -f $CORDOVA_BASE_REL` #Calculated absolute path of Cordova apps' base directory.
+REACT_BASE=`readlink -f $REACT_BASE_REL`     #Calculated absolute path of React apps' base directory.
+CORDOVA_RUN=                                 #Script to build and run Cordova (from the root of Cordova app directory). If not set or empty, then use builtin defaults.
+CORDOVA_KEYSTORE=                            #Cordova Android build credentials.
+CORDOVA_KEYSTORE_PASSWORD=                   #Cordova Android build credentials.
+CORDOVA_KEY=                                 #Cordova Android build credentials.
+CORDOVA_KEY_PASSWORD=                        #Cordova Android build credentials.
+IAM=                                         #Which version of the script this one is.
 #--------------------------------------------------------------------------------------------------------------------------------------------------
 VERSION=
 #--------------------------------------------------------------------------------------------------------------------------------------------------
