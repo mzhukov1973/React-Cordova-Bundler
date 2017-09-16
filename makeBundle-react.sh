@@ -14,25 +14,80 @@
 #  See the License for the specific language governing permissions and      #
 #  limitations under the License.                                           #
 #===========================================================================#
-
-#------Options-------------------------------------------------------------------------------------------------------------------------------------
-BASE_APP_NAME=                               #As is - base name of the app, cordova & react apps' folders names are formed based on this variable.
-CORDOVA_BASE_REL="../$BASE_APP_NAME-cordova" #Cordova base dir. Relative path from the root of React Apps' base dir (where this script is located).
-REACT_BASE_REL="."                           #React base dir. Since this is Reacts' copy of the script it is  ".".
-CORDOVA_BASE=`readlink -f $CORDOVA_BASE_REL` #Calculated absolute path of Cordova apps' base directory.
-REACT_BASE=`readlink -f $REACT_BASE_REL`     #Calculated absolute path of React apps' base directory.
-CORDOVA_RUN=                                 #Script to build and run Cordova (from the root of Cordova app directory). If not set or empty, then use builtin defaults.
-CORDOVA_KEYSTORE=                            #Cordova Android build credentials.
-CORDOVA_KEYSTORE_PASSWORD=                   #Cordova Android build credentials.
-CORDOVA_KEY=                                 #Cordova Android build credentials.
-CORDOVA_KEY_PASSWORD=                        #Cordova Android build credentials.
-IAM=                                         #Which version of the script this one is.
-#--------------------------------------------------------------------------------------------------------------------------------------------------
 VERSION=
+#------Options-------------------------------------------------------------------------------------------------------------------------------------
+
+BASE_APP_NAME=                                  #As is - base name of the app, cordova & react apps' folders names are formed based on this variable.
+CORDOVA_BASE_REL="../$BASE_APP_NAME-cordova"    #Cordova base dir. Relative path from the root of React Apps' base dir (where this script is located).
+REACT_BASE_REL="."                              #React base dir. Since this is Reacts' copy of the script it is  ".".
+CORDOVA_BASE=`readlink -f $CORDOVA_BASE_REL`    #Calculated absolute path of Cordova apps' base directory.
+REACT_BASE=`readlink -f $REACT_BASE_REL`        #Calculated absolute path of React apps' base directory.
+CORDOVA_RUN=                                    #Script to build and run Cordova (from the root of Cordova app directory). If not set or empty, then use builtin defaults.
+CORDOVA_RUN_EN=                                 #Script to build and run Cordova (from the root of Cordova app directory). If not set or empty, then use builtin defaults.
+CORDOVA_RUN_EX=                                 #Script to build and run Cordova (from the root of Cordova app directory). If not set or empty, then use builtin defaults.
+CORDOVA_KEYSTORE=                               #Cordova Android build credentials.
+CORDOVA_KEYSTORE_EN=                            #Cordova Android build credentials.
+CORDOVA_KEYSTORE_EX=                            #Cordova Android build credentials.
+CORDOVA_KEYSTORE_PASSWORD=                      #Cordova Android build credentials.
+CORDOVA_KEYSTORE_PASSWORD_EN=                   #Cordova Android build credentials.
+CORDOVA_KEYSTORE_PASSWORD_EX=                   #Cordova Android build credentials.
+CORDOVA_KEY=                                    #Cordova Android build credentials.
+CORDOVA_KEY_EN=                                 #Cordova Android build credentials.
+CORDOVA_KEY_EX=                                 #Cordova Android build credentials.
+CORDOVA_KEY_PASSWORD=                           #Cordova Android build credentials.
+CORDOVA_KEY_PASSWORD_EN=                        #Cordova Android build credentials.
+CORDOVA_KEY_PASSWORD_EX=                        #Cordova Android build credentials.
+IAM=                                            #Which version of the script this one is.
+#IAM_EN=                                        #Which version of the script this one is.
+#IAM_EX=                                        #Which version of the script this one is.
 #--------------------------------------------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 
 #------Functions-----------------------------------------------------------------------------------------------------------------------------------
+escape_for_sed () {
+ #Auto-escape user option strings to make them usable in sed:
+ return printf "%q" $1;
+}
+
+get_cordova_run_from_ex () {
+}
+get_cordova_run_from_en () {
+}
+
+ask_for_cordova_keystore () {
+ if [ 0 -ne `read -p 'CORDOVA_KEYSTORE is not set. Please, provide path to the keystore: ' REPLY_RES` ]; then return ask_for_cordova_keystore; else return escape_for_sed $REPLY_RES; fi
+}
+get_cordova_keystore_from_ex () {
+}
+get_cordova_keystore_from_en () {
+}
+
+ask_for_cordova_keystore_password () {
+ if [ 0 -ne `read -p 'CORDOVA_KEYSTORE_PASSWORD is not set. Please, provide the password to the keystore: ' REPLY_RES` ]; then return ask_for_cordova_keystore_password; else return escape_for_sed $REPLY_RES; fi
+}
+get_cordova_keystore_password_from_ex () {
+}
+get_cordova_keystore_password_from_en () {
+}
+
+ask_for_cordova_key () {
+ if [ 0 -ne `read -p 'CORDOVA_KEY is not set. Please, provide key alias: ' REPLY_RES` ]; then return ask_for_cordova_key; else return escape_for_sed $REPLY_RES; fi
+}
+get_cordova_key_from_ex () {
+}
+get_cordova_key_from_en () {
+}
+
+ask_for_cordova_key_password () {
+ if [ 0 -ne `read -p 'CORDOVA_KEY_PASSWORD is not set. Please, provide the password to the key: ' REPLY_RES` ]; then return ask_for_cordova_key_password; else return escape_for_sed $REPLY_RES; fi
+}
+get_cordova_key_password_from_ex () {
+}
+get_cordova_key_password_from_en () {
+}
+
 update_copied_asset-manifest () {
  sed -i 's/css\/main[\.a-zA-Z0-9]*css/css\/react_main\.css/g'           "$CORDOVA_BASE/www/asset-manifest.json";
  sed -i 's/css\/main[\.a-zA-Z0-9]*css\.map/css\/react_main\.css\.map/g' "$CORDOVA_BASE/www/asset-manifest.json";
@@ -122,12 +177,17 @@ rct2cor_js () {
  cd "$REACT_BASE";
 }
 
-
-
 #--------------------------------------------------------------------------------------------------------------------------------------------------
 
 
+
 #------Script itself-------------------------------------------------------------------------------------------------------------------------------
+#Get user options by whichever way available:
+if [ ! -z $CORDOVA_RUN ]; then if [ ! -z $CORDOVA_RUN_EN ]; then if [ ! -z $CORDOVA_RUN_EX ]; then continue; else CORDOVA_RUN=`get_cordova_run_from_ex`; fi else CORDOVA_RUN=`get_cordova_run_from_en`; fi fi
+if [ ! -z $CORDOVA_KEYSTORE ]; then if [ ! -z $CORDOVA_KEYSTORE_EN ]; then if [ ! -z $CORDOVA_KEYSTORE_EX ]; then CORDOVA_KEYSTORE=`ask_for_cordova_keystore`; else CORDOVA_KEYSTORE=`get_cordova_keystore_from_ex`; fi else CORDOVA_KEYSTORE=`get_cordova_keystore_from_en`; fi fi
+if [ ! -z $CORDOVA_KEYSTORE_PASSWORD ]; then if [ ! -z $CORDOVA_KEYSTORE_PASSWORD_EN ]; then if [ ! -z $CORDOVA_KEYSTORE_PASSWORD_EX ]; then CORDOVA_KEYSTORE_PASSWORD=`ask_for_cordova_keystore_password`; else CORDOVA_KEYSTORE_PASSWORD=`get_cordova_keystore_password_from_ex`; fi else CORDOVA_KEYSTORE_PASSWORD=`get_cordova_keystore_password_from_en`; fi fi
+if [ ! -z $CORDOVA_KEY ]; then if [ ! -z $CORDOVA_KEYE_EN ]; then if [ ! -z $CORDOVA_KEY_EX ]; then CORDOVA_KEY=`ask_for_cordova_key`; else CORDOVA_KEY=`get_cordova_key_from_ex`; fi else CORDOVA_KEY=`get_cordova_key_from_en`; fi fi
+if [ ! -z $CORDOVA_KEY_PASSWORD ]; then if [ ! -z $CORDOVA_KEY_PASSWORD_EN ]; then if [ ! -z $CORDOVA_KEY_PASSWORD_EX ]; then CORDOVA_KEY_PASSWORD=`ask_for_cordova_key_password`; else CORDOVA_KEY_PASSWORD=`get_cordova_key_password_from_ex`; fi else CORDOVA_KEY_PASSWORD=`get_cordova_key_password_from_en`; fi fi
 
 #Build standalone React app (i.e. 'npm run build'):
 npm run build

@@ -1,7 +1,16 @@
 # React-Cordova-Bundler
 **A simple bash script to bundle together vanilla template apps created by `create-react-app xxx` and `cordova create xxx`, as well as already existing apps of both kinds.**
 
-#### Version: 0.0.1
+#### Version: 0.0.2
+#####Version history:
+#####0.0.1:
+######- Basic stuff, first GitHub upload point.
+
+#####0.0.2:
+######- Added auto-installation of Android platform for Cordova when creating Cordova app from scratch.
+######- Added options storage variant: ask during script execution.
+######- Made 'ask during script execution' the default fallback options storage variant.
+######- Added user-available per-option storage variant selection.
 
 ## Bugs: :warning:
 Report issues on the [React-Cordova-Bundler issue tracker]. (https://github.com/mzhukov1973/React-Cordova-Bundler/issues)
@@ -70,11 +79,11 @@ To combine the two apps we essentially do the following:
 To this end, we
 
 ## ToDo: :calendar:
-- [x] ~~Options to set both app base name, cordova android build credentials, relevant folder names etc,~~ with **configurable storage options on a per-option basis** (to provide for, say, storing credential-related secrets in environment variable, while keeping the rest of the options in-file).
+- [x] ~~Options to set both app base name, cordova android build credentials, relevant folder names etc, with configurable storage options on a per-option basis (to provide for, say, storing credential-related secrets in environment variable, while keeping the rest of the options in-file).~~
 - [x] ~~Options storage variant: in a section of the script file (a clearly marked out and commented section at the top of `makeBundle-init.sh` script).~~
 - [ ] Options storage variant: in environment variables (useful to keep cordova build credentials at hand, but out of commits).
 - [ ] Options storage variant: in an external file (useful to keep cordova build credentials at hand, but out of commits).
-- [ ] Options storage variant: ask during script execution (the last fallback option).
+- [x] ~~Options storage variant: ask during script execution (the last fallback option).~~
 - [ ] :question: *General replacement placeholder format (with a default fallback).*
 - [ ] :question: *npm installer that is cordova/react aware.*
 - [ ] Simple, user-adaptable syntax (i.e. a system for markers for sed to use and resources, assosiated with these markers, **user comments should be allowed for!**).
@@ -82,6 +91,6 @@ To this end, we
 - [x] ~~Optionally some resources could be stored in a separate file (referenced in scripts' bodies).~~ Must make it universal.
 - [x] ~~User-defined build script for Cordova (optional).~~
 - [x] ~~Auto-init everything, including vanilla apps creation with `create-react-app` and `cordova create` prior to bundling them together for development.~~
-- [ ] Auto-add Android platform when creating vanilla template app for Cordova, since we are Android-centered anyway.
+- [x] ~~Auto-add Android platform when creating vanilla template app for Cordova, since we are Android-centered anyway.~~
 - [ ] Documentation.
 - [ ] Make `makeBundle-react.sh` source contained within `makeBundle-init.sh` script body.

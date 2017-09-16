@@ -16,22 +16,48 @@
 #===========================================================================#
 
 #Install (place a copy of bundle-build script in either directory, alter reacts' index.js, delete unneeded js, css & img folders from cordova, while keeping cordova logo from www/img/logo.png in www/static/media/cordova-logo.png
-
+VERSION='0.0.3'
 #------Options-------------------------------------------------------------------------------------------------------------------------------------
 #+++++N.B.!: Should add simpler abs/rel paths input options here, autodetect.++++++
-BASE_APP_NAME="asd"
-CORDOVA_BASE_REL="./$BASE_APP_NAME-cordova" #Cordova base dir. Relative path from the root of React Apps' base dir (where this script is located).
-REACT_BASE_REL="./$BASE_APP_NAME-react"     #React base dir. Since this is Reacts' copy of the script it is  ".".
-CORDOVA_RUN=''                              #N.B.: Must auto-escape these strings for use in sed (later)
-CORDOVA_KEYSTORE=''                         #N.B.: Must auto-escape these strings for use in sed (later)
-CORDOVA_KEYSTORE_PASSWORD=''                #N.B.: Must auto-escape these strings for use in sed (later)
-CORDOVA_KEY=''                              #N.B.: Must auto-escape these strings for use in sed (later)
-CORDOVA_KEY_PASSWORD=''                     #N.B.: Must auto-escape these strings for use in sed (later)
+BASE_APP_NAME=''
+BASE_APP_NAME_EN=''
+BASE_APP_NAME_EX=''
+CORDOVA_BASE_REL="./$BASE_APP_NAME-cordova"    #Cordova base dir. Relative path from the root of React Apps' base dir (where this script is located).
+REACT_BASE_REL="./$BASE_APP_NAME-react"        #React base dir. Since this is Reacts' copy of the script it is  ".".
+CORDOVA_RUN=''                                 #N.B.: Must auto-escape these strings for use in sed (later)
+CORDOVA_RUN_EN=''                              #N.B.: Must auto-escape these strings for use in sed (later)
+CORDOVA_RUN_EX=''                              #N.B.: Must auto-escape these strings for use in sed (later)
+CORDOVA_KEYSTORE=''                            #N.B.: Must auto-escape these strings for use in sed (later)
+CORDOVA_KEYSTORE_EN=''                         #N.B.: Must auto-escape these strings for use in sed (later)
+CORDOVA_KEYSTORE_EX=''                         #N.B.: Must auto-escape these strings for use in sed (later)
+CORDOVA_KEYSTORE_PASSWORD=''                   #N.B.: Must auto-escape these strings for use in sed (later)
+CORDOVA_KEYSTORE_PASSWORD_EN=''                #N.B.: Must auto-escape these strings for use in sed (later)
+CORDOVA_KEYSTORE_PASSWORD_EX=''                #N.B.: Must auto-escape these strings for use in sed (later)
+CORDOVA_KEY=''                                 #N.B.: Must auto-escape these strings for use in sed (later)
+CORDOVA_KEY_EN=''                              #N.B.: Must auto-escape these strings for use in sed (later)
+CORDOVA_KEY_EX=''                              #N.B.: Must auto-escape these strings for use in sed (later)
+CORDOVA_KEY_PASSWORD=''                        #N.B.: Must auto-escape these strings for use in sed (later)
+CORDOVA_KEY_PASSWORD_EN=''                     #N.B.: Must auto-escape these strings for use in sed (later)
+CORDOVA_KEY_PASSWORD_EX=''                     #N.B.: Must auto-escape these strings for use in sed (later)
+#N.B.: - if an option is empty or not set, and neither ..._EN nor ..._EX variables are non-empty, then ASK;
+#      - if an option is not set and ..._EN variable is not empty, then it should be attempted to be fetched from an environment variable, with the name stored in the $<OPTION_NAME>_EN variable;
+#      - if an option is not set and ..._EX variable is not empty, then it should be attempted to be fetched from an external file, with the path stored in $<OPTION_NAME>_EX variable;
+#      - if more than one variant is set, then order of precedence is as follows (from most to least important): This Scripts' body => Environment Variable => External File => Ask.
 #--------------------------------------------------------------------------------------------------------------------------------------------------
-VERSION='0.0.1'
+ask_for_base_app_name () {
+ if [ 0 -ne `read -p 'BASE_APP_NAME is not set. Please, provide it here: ' REPLY_RES` ]; then return ask_for_base_app_name; fi #Ask away, until successful.
+ if [[ ! $REPLY_RES =~ [a-zA-Z0-9]* ]]; then return ask_for_base_app_name; fi                                                  #If the name given contains characters, other than alphanumeric - ask again.
+ return $REPLY_RES;
+}
+get_base_app_name_from_ex () {
+}
+get_base_app_name_from_en () {
+}
+if [ ! -z $BASE_APP_NAME ]; then if [ ! -z $BASE_APP_NAME_EN ]; then if [ ! -z $BASE_APP_NAME_EX ]; then BASE_APP_NAME=`ask_for_base_app_name`; else BASE_APP_NAME=`get_base_app_name_from_ex`; fi else BASE_APP_NAME=`get_base_app_name_from_en`; fi fi
+
 if [ -f "./init_$BASE_APP_NAME_done" ]; then echo "Init has already been run for $BASE_APP_NAME in this directory, exiting..."; exit 1; fi
 #Create both apps if directories are not present:
-if [ ! -d "$CORDOVA_BASE_REL" ]; then cordova create "$BASE_APP_NAME-cordova"; fi
+if [ ! -d "$CORDOVA_BASE_REL" ]; then cordova create "$BASE_APP_NAME-cordova"; cd "$BASE_APP_NAME-cordova"; cordova platform add android; cd ..; fi
 if [ ! -d "$REACT_BASE_REL" ]; then create-react-app "$BASE_APP_NAME-react"; fi
 CORDOVA_BASE=`readlink -f $CORDOVA_BASE_REL` #Calculated absolute path of Cordova apps' base directory.
 REACT_BASE=`readlink -f $REACT_BASE_REL`     #Calculated absolute path of React apps' base directory.
@@ -57,10 +83,20 @@ sed -i "s/VERSION=/VERSION='$VERSION'/g" "$REACT_BASE/makeBundle-react.sh"
 sed -i "s/IAM=/IAM='React'/g" "$REACT_BASE/makeBundle-react.sh"
 sed -i "s/BASE_APP_NAME=/BASE_APP_NAME=\"$BASE_APP_NAME\"/g" "$REACT_BASE/makeBundle-react.sh"
 if [ ! -z $CORDOVA_RUN ];               then sed -i "s/CORDOVA_RUN=/CORDOVA_RUN=\"$CORDOVA_RUN\"/g"                                           "$REACT_BASE/makeBundle-react.sh"; else sed -i "s/CORDOVA_RUN=/#CORDOVA_RUN=/g"                             "$REACT_BASE/makeBundle-react.sh"; fi
+if [ ! -z $CORDOVA_RUN_EN ];               then sed -i "s/CORDOVA_RUN_EN=/CORDOVA_RUN_EN=\"$CORDOVA_RUN_EN\"/g"                                           "$REACT_BASE/makeBundle-react.sh"; else sed -i "s/CORDOVA_RUN_EN=/#CORDOVA_RUN_EN=/g"                             "$REACT_BASE/makeBundle-react.sh"; fi
+if [ ! -z $CORDOVA_RUN_EX ];               then sed -i "s/CORDOVA_RUN_EX=/CORDOVA_RUN_EX=\"$CORDOVA_RUN_EX\"/g"                                           "$REACT_BASE/makeBundle-react.sh"; else sed -i "s/CORDOVA_RUN_EX=/#CORDOVA_RUN_EX=/g"                             "$REACT_BASE/makeBundle-react.sh"; fi
 if [ ! -z $CORDOVA_KEYSTORE ];          then sed -i "s/CORDOVA_KEYSTORE=/CORDOVA_KEYSTORE=\"$CORDOVA_KEYSTORE\"/g"                            "$REACT_BASE/makeBundle-react.sh"; else sed -i "s/CORDOVA_KEYSTORE=/#CORDOVA_KEYSTORE=/g"                   "$REACT_BASE/makeBundle-react.sh"; fi
+if [ ! -z $CORDOVA_KEYSTORE_EN ];          then sed -i "s/CORDOVA_KEYSTORE_EN=/CORDOVA_KEYSTORE_EN=\"$CORDOVA_KEYSTORE_EN\"/g"                            "$REACT_BASE/makeBundle-react.sh"; else sed -i "s/CORDOVA_KEYSTORE_EN=/#CORDOVA_KEYSTORE_EN=/g"                   "$REACT_BASE/makeBundle-react.sh"; fi
+if [ ! -z $CORDOVA_KEYSTORE_EX ];          then sed -i "s/CORDOVA_KEYSTORE_EX=/CORDOVA_KEYSTORE_EX=\"$CORDOVA_KEYSTORE_EX\"/g"                            "$REACT_BASE/makeBundle-react.sh"; else sed -i "s/CORDOVA_KEYSTORE_EX=/#CORDOVA_KEYSTORE_EX=/g"                   "$REACT_BASE/makeBundle-react.sh"; fi
 if [ ! -z $CORDOVA_KEYSTORE_PASSWORD ]; then sed -i "s/CORDOVA_KEYSTORE_PASSWORD=/CORDOVA_KEYSTORE_PASSWORD=\"$CORDOVA_KEYSTORE_PASSWORD\"/g" "$REACT_BASE/makeBundle-react.sh"; else sed -i "s/CORDOVA_KEYSTORE_PASSWORD=/#CORDOVA_KEYSTORE_PASSWORD=/g" "$REACT_BASE/makeBundle-react.sh"; fi
+if [ ! -z $CORDOVA_KEYSTORE_PASSWORD_EN ]; then sed -i "s/CORDOVA_KEYSTORE_PASSWORD_EN=/CORDOVA_KEYSTORE_PASSWORD_EN=\"$CORDOVA_KEYSTORE_PASSWORD_EN\"/g" "$REACT_BASE/makeBundle-react.sh"; else sed -i "s/CORDOVA_KEYSTORE_PASSWORD_EN=/#CORDOVA_KEYSTORE_PASSWORD_EN=/g" "$REACT_BASE/makeBundle-react.sh"; fi
+if [ ! -z $CORDOVA_KEYSTORE_PASSWORD_EX ]; then sed -i "s/CORDOVA_KEYSTORE_PASSWORD_EX=/CORDOVA_KEYSTORE_PASSWORD_EX=\"$CORDOVA_KEYSTORE_PASSWORD_EX\"/g" "$REACT_BASE/makeBundle-react.sh"; else sed -i "s/CORDOVA_KEYSTORE_PASSWORD_EX=/#CORDOVA_KEYSTORE_PASSWORD_EX=/g" "$REACT_BASE/makeBundle-react.sh"; fi
 if [ ! -z $CORDOVA_KEY ];               then sed -i "s/CORDOVA_KEY=/CORDOVA_KEY=\"$CORDOVA_KEY\"/g"                                           "$REACT_BASE/makeBundle-react.sh"; else sed -i "s/CORDOVA_KEY=/#CORDOVA_KEY=/g"                             "$REACT_BASE/makeBundle-react.sh"; fi
+if [ ! -z $CORDOVA_KEY_EN ];               then sed -i "s/CORDOVA_KEY_EN=/CORDOVA_KEY_EN=\"$CORDOVA_KEY_EN\"/g"                                           "$REACT_BASE/makeBundle-react.sh"; else sed -i "s/CORDOVA_KEY_EN=/#CORDOVA_KEY_EN=/g"                             "$REACT_BASE/makeBundle-react.sh"; fi
+if [ ! -z $CORDOVA_KEY_EX ];               then sed -i "s/CORDOVA_KEY_EX=/CORDOVA_KEY_EX=\"$CORDOVA_KEY_EX\"/g"                                           "$REACT_BASE/makeBundle-react.sh"; else sed -i "s/CORDOVA_KEY_EX=/#CORDOVA_KEY_EX=/g"                             "$REACT_BASE/makeBundle-react.sh"; fi
 if [ ! -z $CORDOVA_KEY_PASSWORD ];      then sed -i "s/CORDOVA_KEY_PASSWORD=/CORDOVA_KEY_PASSWORD=\"$CORDOVA_KEY_PASSWORD\"/g"                "$REACT_BASE/makeBundle-react.sh"; else sed -i "s/CORDOVA_KEY_PASSWORD=/#CORDOVA_KEY_PASSWORD=/g"           "$REACT_BASE/makeBundle-react.sh"; fi
+if [ ! -z $CORDOVA_KEY_PASSWORD_EN ];      then sed -i "s/CORDOVA_KEY_PASSWORD_EN=/CORDOVA_KEY_PASSWORD_EN=\"$CORDOVA_KEY_PASSWORD_EN\"/g"                "$REACT_BASE/makeBundle-react.sh"; else sed -i "s/CORDOVA_KEY_PASSWORD_EN=/#CORDOVA_KEY_PASSWORD_EN=/g"           "$REACT_BASE/makeBundle-react.sh"; fi
+if [ ! -z $CORDOVA_KEY_PASSWORD_EX ];      then sed -i "s/CORDOVA_KEY_PASSWORD_EX=/CORDOVA_KEY_PASSWORD_EX=\"$CORDOVA_KEY_PASSWORD_EX\"/g"                "$REACT_BASE/makeBundle-react.sh"; else sed -i "s/CORDOVA_KEY_PASSWORD_EX=/#CORDOVA_KEY_PASSWORD_EX=/g"           "$REACT_BASE/makeBundle-react.sh"; fi
 
 #Mark init as having already run for these folders:
 touch ./init_"$BASE_APP_NAME"_done

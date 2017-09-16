@@ -1,1 +1,10 @@
-0.0.1 - basic stuff, GitHub upload point
+0.0.1 - Basic stuff, first GitHub upload point.
+
+0.0.2 - Added auto-installation of Android platform for Cordova when creating Cordova app from scratch.
+      - Added options storage variant: ask during script execution.
+      - Made 'ask during script execution' the default fallback options storage variant.
+      - Added user-available per-option storage variant selection.
+
+0.0.3 - Added options storage variant: environment variable(s).
+      - Added options storage variant: external file(s).
+      - Added auto-escaping to user-provided options to make them usable in sed.
