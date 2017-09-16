@@ -4,7 +4,7 @@
 #### Version: 0.0.1
 
 ## Bugs: :warning:
-Report issues on the [React-Cordova-Bundler issue tracker].(https://github.com/mzhukov1973/React-Cordova-Bundler/issues)
+Report issues on the [React-Cordova-Bundler issue tracker]. (https://github.com/mzhukov1973/React-Cordova-Bundler/issues)
 
 ## Description: :notebook:
 A simple bash script to bundle together vanilla template apps created by `create-react-app` and `cordova create` as well as already existing apps of both kinds. 
