@@ -1,7 +1,7 @@
 # React-Cordova-Bundler
 **A simple bash script to bundle together vanilla template apps created by `create-react-app xxx` and `cordova create xxx`, as well as already existing apps of both kinds.**
 
-#### Version: 0.0.2
+#### Version: 0.0.3
 ##### Version history
 ##### 0.0.1:
 ###### - Basic stuff, first GitHub upload point.
