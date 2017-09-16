@@ -2,15 +2,20 @@
 **A simple bash script to bundle together vanilla template apps created by `create-react-app xxx` and `cordova create xxx`, as well as already existing apps of both kinds.**
 
 #### Version: 0.0.2
-#####Version history:
-#####0.0.1:
-######- Basic stuff, first GitHub upload point.
+##### Version history
+##### 0.0.1:
+###### - Basic stuff, first GitHub upload point.
 
-#####0.0.2:
-######- Added auto-installation of Android platform for Cordova when creating Cordova app from scratch.
-######- Added options storage variant: ask during script execution.
-######- Made 'ask during script execution' the default fallback options storage variant.
-######- Added user-available per-option storage variant selection.
+##### 0.0.2:
+###### - Added auto-installation of Android platform for Cordova when creating Cordova app from scratch.
+###### - Added options storage variant: ask during script execution.
+###### - Made 'ask during script execution' the default fallback options storage variant.
+###### - Added user-available per-option storage variant selection.
+
+##### 0.0.3:
+###### - Added options storage variant: environment variable(s).
+###### - Added options storage variant: external file(s).
+###### - Added auto-escaping to user-provided options to make them usable in sed.
 
 ## Bugs: :warning:
 Report issues on the [React-Cordova-Bundler issue tracker]. (https://github.com/mzhukov1973/React-Cordova-Bundler/issues)
@@ -81,8 +86,8 @@ To this end, we
 ## ToDo: :calendar:
 - [x] ~~Options to set both app base name, cordova android build credentials, relevant folder names etc, with configurable storage options on a per-option basis (to provide for, say, storing credential-related secrets in environment variable, while keeping the rest of the options in-file).~~
 - [x] ~~Options storage variant: in a section of the script file (a clearly marked out and commented section at the top of `makeBundle-init.sh` script).~~
-- [ ] Options storage variant: in environment variables (useful to keep cordova build credentials at hand, but out of commits).
-- [ ] Options storage variant: in an external file (useful to keep cordova build credentials at hand, but out of commits).
+- [x] ~~Options storage variant: in environment variables (useful to keep cordova build credentials at hand, but out of commits).~~
+- [x] ~~Options storage variant: in an external file (useful to keep cordova build credentials at hand, but out of commits).~~
 - [x] ~~Options storage variant: ask during script execution (the last fallback option).~~
 - [ ] :question: *General replacement placeholder format (with a default fallback).*
 - [ ] :question: *npm installer that is cordova/react aware.*
