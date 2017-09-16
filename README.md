@@ -93,7 +93,7 @@ To this end, we
 - [ ] :question: *npm installer that is cordova/react aware.*
 - [ ] Simple, user-adaptable syntax (i.e. a system for markers for sed to use and resources, assosiated with these markers, **user comments should be allowed for!**).
 - [x] ~~Replacement resources should be stored inside scripts' bodies.~~
-- [x] ~~Optionally some resources could be stored in a separate file (referenced in scripts' bodies).~~ Must make it universal.
+- [ ] ~~Optionally some resources could be stored in a separate file (referenced in scripts' bodies).~~ Must make it universal.
 - [x] ~~User-defined build script for Cordova (optional).~~
 - [x] ~~Auto-init everything, including vanilla apps creation with `create-react-app` and `cordova create` prior to bundling them together for development.~~
 - [x] ~~Auto-add Android platform when creating vanilla template app for Cordova, since we are Android-centered anyway.~~
